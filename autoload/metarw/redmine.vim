@@ -1,5 +1,7 @@
-let s:redmine_server = get(g:, 'metarw_redmine_server')
-let s:redmine_apikey = get(g:, 'metarw_redmine_apikey')
+let s:redmine_server     = get(g:, 'metarw_redmine_server')
+let s:redmine_apikey     = get(g:, 'metarw_redmine_apikey')
+let s:redmine_projectkey = get(g:, 'metarw_redmine_projectkey')
+let s:redmine_queryid    = get(g:, 'metarw_redmine_queryid')
 
 function! metarw#redmine#complete(arglead, cmdline, cursorpos)
   let _ = s:parse_incomplete_fakepath(a:arglead)
@@ -167,6 +169,11 @@ function! s:url(...)
   return join([server] + a:000 + ['?key=', s:redmine_apikey], '')
 endfunction
 
+function! s:tmpurl(...)
+  let server = substitute(s:redmine_server, '/\+$', '', '')
+  return join([server] + a:000 + ['&key=', s:redmine_apikey], '')
+endfunction
+
 function! s:write_new(_, content)
   let data = {}
   let lines = split(a:content, '\n--\n', 2)
@@ -254,7 +261,10 @@ function! s:get_projects(_)
 endfunction
 
 function! s:get_issues(_)
-  let result = webapi#http#get(s:url('/issues.json'), '', {
+  " let result = webapi#http#get(s:url('/issues.json'), '', {
+  " let result = webapi#http#get(s:tmpurl('/projects/40/issues.json?query_id=298'), '', {
+  " let result = webapi#http#get(s:url('/issues/', a:_.issue, '.json'), '', {
+  let result = webapi#http#get(s:tmpurl('/projects/', s:redmine_projectkey, '/issues.json?query_id=', s:redmine_queryid), '', {
   \   "Content-Type": "application/json"
   \ })
   if result.status !~ '^2'
