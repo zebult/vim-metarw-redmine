@@ -138,7 +138,7 @@ function! s:read_list(_)
     endtry
     for issue in issues
       call add(result, {
-      \    'label': issue.subject,
+      \    'label': s:format_param(issue.due_date, 10) . ' | '. s:format_param(issue.done_ratio, 3) . ' | '. s:format_param(issue.status.name, 11) . ' | '. s:format_param(issue.priority.name, 6) . ' | '. s:format_param(issue.subject, 0),
       \    'fakepath': printf('%s:/%s/%s',
       \                       a:_.scheme,
       \                       a:_.project,
@@ -293,4 +293,12 @@ function! s:get_issue(_)
   endif
 
   return json.issue
+endfunction
+
+function! s:format_param(word, num)
+  let w = a:word
+  while strlen(w) < a:num
+    let w = w . ' '
+  endwhile
+  return w
 endfunction
